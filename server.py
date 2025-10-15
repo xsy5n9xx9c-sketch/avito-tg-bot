@@ -1,20 +1,19 @@
 from fastapi import FastAPI, Request
-from bot import send_avito_message
-from database import get_user
-import json
+from bot import dp, bot
+from aiogram import executor
+import asyncio
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
+    # запускаем Telegram-бота при старте сервера
+    loop = asyncio.get_event_loop()
+    loop.create_task(executor.start_polling(dp, skip_updates=True))
 
 @app.post("/avito-webhook")
 async def avito_webhook(req: Request):
     data = await req.json()
-    print("Webhook data:", data)
-
-    # Временный пример: отправка уведомления всем пользователям
-    # Позже можно добавить фильтрацию по notify_types
-    users = [get_user(uid) for uid in range(1, 1000)]  # пример, замените на реальную логику
-    for user in users:
-        if user:
-            telegram_id = user[0]
-            await send_avito_message(telegram_id, f"Новое событие: {json.dumps(data)}")
+    # пример: отправка сообщения одному пользователю
+    await bot.send_message(123456789, f"Новое событие: {data}")
     return {"ok": True}
