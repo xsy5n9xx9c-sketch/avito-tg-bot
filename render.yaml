@@ -3,4 +3,5 @@ services:
     name: avito-tg-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python bot.py"
+    startCommand: "python main.py"
+
